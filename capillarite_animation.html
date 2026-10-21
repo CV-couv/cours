@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Capillarité – remontée de l’eau entre deux plaques de verre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Oswald:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --jaune:#FFED00; --marine:#1B3557; --texte:#1B3557; --fond:#ffffff; --fond2:#F2F4F7;
+  --p1:#1B3557; --p2:#D9480F; --p3:#7B2D9E;
+  --trait:#1B3557; --eau:#3D8FD6; --eau-claire:#A9D3F5; --verre:#CFE8F2; --gris:#6B7785;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --texte:#E8EEF5; --fond:#13202F; --fond2:#1C2C40; --trait:#C9D6E5;
+    --p1:#8FB8E8; --p2:#FF8A50; --p3:#C990F0;
+    --eau:#4FA3EA; --eau-claire:#2D5C86; --verre:#2F4A5E; --gris:#9AA8B8;
+    color-scheme: dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{
+  background:var(--fond); color:var(--texte);
+  font-family:"Montserrat", "Segoe UI", Arial, sans-serif;
+  padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);
+  display:flex; flex-direction:column; height:100vh; height:100dvh;
+}
+header{display:flex; align-items:center; gap:1rem; padding:clamp(.4rem,1.2vh,1rem) clamp(1rem,3vw,2.5rem) .3rem; flex:none}
+header p{flex:1}
+h1{
+  font-family:"Gobold","Oswald","Arial Narrow",sans-serif; font-weight:600;
+  font-size:clamp(1.3rem,4vh,2.4rem); margin:0; line-height:1.1;
+  background:var(--jaune); color:#1B3557; padding:.2em .6em;
+}
+header p{margin:0; font-size:clamp(.8rem,1.9vh,1.1rem); max-width:60ch}
+main{
+  flex:1; min-height:0; display:grid; gap:clamp(.5rem,1.5vw,1.4rem);
+  grid-template-columns:minmax(0,2.2fr) minmax(15rem,1fr); grid-template-rows:minmax(0,1fr);
+  padding:.3rem clamp(1rem,3vw,2.5rem);
+}
+.scene{background:var(--fond2); border-radius:6px; padding:.3rem; min-height:0; display:flex; position:relative}
+.scene svg{width:100%; height:100%; display:block}
+aside{display:flex; flex-direction:column; gap:clamp(.4rem,1.4vh,1rem); min-height:0; overflow:hidden}
+.chrono{
+  font-family:"Gobold","Oswald","Arial Narrow",sans-serif; font-size:clamp(1.8rem,6vh,3.6rem);
+  line-height:1; font-variant-numeric:tabular-nums;
+}
+.chrono small{font-family:"Montserrat",sans-serif; font-size:.8rem; display:inline; color:var(--gris); margin-left:.5rem}
+.hauteur{font-size:clamp(.8rem,1.8vh,1rem); color:var(--gris)}
+.hauteur b{color:var(--texte); font-variant-numeric:tabular-nums}
+.mesuresX{display:flex; flex-direction:column; gap:clamp(.25rem,.8vh,.5rem)}
+.carteX{
+  display:flex; align-items:center; gap:.7rem;
+  border:3px solid var(--c); border-radius:6px; padding:clamp(.2rem,.8vh,.5rem) .8rem;
+}
+.carteX i{
+  flex:none; width:clamp(1.8rem,4.6vh,2.4rem); height:clamp(1.8rem,4.6vh,2.4rem); border-radius:50%;
+  background:var(--c); color:#fff; font-style:normal; font-weight:700;
+  display:grid; place-items:center; font-size:clamp(1rem,2.6vh,1.4rem);
+}
+.carteX span{font-weight:600; font-size:clamp(.8rem,1.8vh,1rem); flex:1; line-height:1.2}
+.carteX span em{font-style:normal; font-weight:700; color:var(--c); font-size:1.5em; line-height:1}
+.carteX b{
+  font-family:"Gobold","Oswald","Arial Narrow",sans-serif; font-weight:600;
+  font-size:clamp(1.4rem,4.4vh,2.4rem); color:var(--c); font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.etat{
+  border-left:6px solid var(--eau); padding:.6rem .8rem; background:var(--fond2);
+  font-weight:600; font-size:clamp(.78rem,1.8vh,1rem); transition:border-color .4s;
+}
+.etat.fini{border-color:var(--jaune)}
+.commandes{display:flex; flex-wrap:wrap; gap:.5rem; align-items:center}
+button,select{
+  font:inherit; font-weight:600; padding:.6rem 1.1rem; border-radius:4px; cursor:pointer;
+  border:2px solid var(--marine); background:var(--marine); color:#fff; min-height:40px; padding:.4rem .9rem;
+}
+button.sec,select{background:transparent; color:var(--texte); border-color:var(--trait)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--jaune); outline-offset:2px}
+.curseur{padding:.2rem clamp(1rem,3vw,2.5rem) 0; flex:none}
+.curseur label{font-weight:600; display:block; font-size:clamp(.8rem,1.8vh,1rem)}
+input[type=range]{width:100%; height:32px; margin:0; accent-color:var(--eau); cursor:pointer}
+.graduations{display:flex; justify-content:space-between; font-size:.85rem; color:var(--gris); font-variant-numeric:tabular-nums}
+.serrage{
+  position:absolute; top:.6rem; left:.6rem; width:min(22rem,46%);
+  background:var(--fond); border:3px solid var(--jaune); border-radius:6px; padding:clamp(.3rem,.9vh,.6rem) .8rem;
+}
+.serrage .titre{display:flex; align-items:center; gap:.6rem; font-weight:700; font-size:clamp(.85rem,1.9vh,1.05rem)}
+.serrage .titre svg{flex:none; width:clamp(2rem,5vh,2.6rem); height:auto}
+.serrage input[type=range]{height:28px; accent-color:var(--marine)}
+.serrage .bornes{display:flex; justify-content:space-between; font-size:.75rem; color:var(--gris)}
+.serrage .info{font-size:clamp(.78rem,1.8vh,.95rem); margin-top:.2rem}
+.serrage .info b{font-variant-numeric:tabular-nums}
+.serrage .gain{display:inline-block; background:var(--jaune); color:#1B3557; font-weight:700; padding:0 .4em; border-radius:3px}
+.graph{flex:1; min-height:0; display:flex; flex-direction:column}
+.graph svg{width:100%; flex:1; min-height:0; display:block}
+.graph h2{font-size:clamp(.8rem,1.8vh,1rem); margin:0 0 .2rem}
+footer{padding:.2rem clamp(1rem,3vw,2.5rem) .4rem; font-size:.75rem; flex:none; color:var(--gris); display:flex; justify-content:space-between; flex-wrap:wrap; gap:.5rem}
+svg text{font-family:"Montserrat",Arial,sans-serif; fill:var(--texte)}
+@media (prefers-reduced-motion:reduce){ .etat{transition:none} }
+@media (orientation:portrait){
+  main{grid-template-columns:1fr; grid-template-rows:minmax(0,1fr) auto}
+  aside{display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); gap:.5rem 1rem; align-items:start}
+  aside > :not(.graph){grid-column:1}
+  aside .graph{grid-column:2; grid-row:1 / span 5; align-self:stretch}
+  .scene svg{max-height:100%}
+  .serrage{top:auto; bottom:.6rem; width:min(24rem,60%)}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Capillarité</h1>
+  <p>On plonge dans l’eau deux plaques de verre maintenues l’une contre l’autre. Que se passe-t-il ?</p>
+  <button id="plein" class="sec">⛶ Plein écran</button>
+</header>
+
+<main>
+  <div class="scene">
+    <svg id="scene" viewBox="20 10 910 450" role="img" aria-label="Cuve remplie d’eau avec trois paires de plaques de verre : une verticale, une peu inclinée, une très inclinée. L’eau monte entre les plaques.">
+      <defs>
+        <marker id="fl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <!-- eau de la cuve -->
+      <rect x="110" y="300" width="680" height="110" fill="var(--eau-claire)"/>
+      <!-- paires de plaques (générées en JS) -->
+      <g id="paires"></g>
+      <!-- cuve -->
+      <path d="M110,250 V410 H790 V250" fill="none" stroke="var(--trait)" stroke-width="5"/>
+      <!-- ligne de niveau à 25 mm -->
+      <line id="ligne25" x1="60" x2="830" y1="240" y2="240" stroke="var(--trait)" stroke-width="1.5" stroke-dasharray="8 6" opacity=".5"/>
+      <line x1="60" x2="110" y1="300" y2="300" stroke="var(--trait)" stroke-width="1.5"/>
+      <g style="color:var(--trait)">
+        <line x1="78" x2="78" y1="298" y2="242" stroke="currentColor" stroke-width="1.5" marker-start="url(#fl)" marker-end="url(#fl)"/>
+      </g>
+      <text x="40" y="276" font-size="18" font-weight="700">25</text>
+      <text x="40" y="294" font-size="12">mm</text>
+      <!-- niveau actuel de la remontée -->
+      <line id="ligneH" x1="110" x2="790" y1="300" y2="300" stroke="var(--eau)" stroke-width="2" stroke-dasharray="3 4"/>
+      <!-- légendes -->
+      <text x="450" y="40" font-size="18" text-anchor="middle" font-weight="600">Plaques de verre accolées</text>
+      <text x="800" y="335" font-size="16">Niveau</text>
+      <text x="800" y="354" font-size="16">du liquide</text>
+      <text x="120" y="440" font-size="16">Cuve</text>
+      <g id="etiquettesX"></g>
+      <!-- cote de la hauteur d'équilibre quand on serre / écarte -->
+      <g id="coteSerre" style="color:var(--p2)" opacity="0">
+        <line id="coteLigne" x1="855" x2="855" y1="298" y2="242" stroke="currentColor" stroke-width="3" marker-end="url(#fl)"/>
+        <line id="coteHaut" x1="790" x2="870" y1="240" y2="240" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/>
+        <text id="coteTexte" x="800" text-anchor="start" dx="62" y="270" font-size="20" font-weight="700" style="fill:var(--p2)"></text>
+      </g>
+    </svg>
+    <div class="serrage">
+      <label class="titre" for="serre">
+        <svg viewBox="0 0 64 40" aria-hidden="true">
+          <rect x="25" y="4" width="5" height="32" fill="var(--verre)" stroke="var(--trait)" stroke-width="2"/>
+          <rect x="34" y="4" width="5" height="32" fill="var(--verre)" stroke="var(--trait)" stroke-width="2"/>
+          <path d="M2 20 H18 M12 13 L19 20 L12 27" fill="none" stroke="var(--p2)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M62 20 H46 M52 13 L45 20 L52 27" fill="none" stroke="var(--p2)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Serrer les plaques
+      </label>
+      <input type="range" id="serre" min="0.5" max="2" step="0.25" value="1">
+      <div class="bornes"><span>Écartées</span><span>Normal</span><span>Très serrées</span></div>
+      <div class="info" id="infoSerre" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <aside>
+    <div class="chrono"><span id="temps">0:00</span><small>min : s</small></div>
+    <div class="mesuresX">
+      <div class="carteX" style="--c:var(--p1)"><i>1</i><span><em>x₁</em><br>verticales</span><b id="mX0">0,0 mm</b></div>
+      <div class="carteX" style="--c:var(--p2)"><i>2</i><span><em>x₂</em><br>peu inclinées</span><b id="mX1">0,0 mm</b></div>
+      <div class="carteX" style="--c:var(--p3)"><i>3</i><span><em>x₃</em><br>très inclinées</span><b id="mX2">0,0 mm</b></div>
+    </div>
+    <div class="hauteur">Remontée verticale : <b id="mH">0,0 mm</b></div>
+    <div class="etat" id="etat" aria-live="polite">Appuie sur « Lancer » ou déplace le curseur.</div>
+    <div class="commandes">
+      <button id="btn">▶ Lancer</button>
+      <button id="raz" class="sec">Remettre à zéro</button>
+      <select id="vitesse" aria-label="Vitesse de l’animation">
+        <option value="1">Temps réel</option>
+        <option value="10">Vitesse × 10</option>
+        <option value="30">Vitesse × 30</option>
+      </select>
+    </div>
+    <div class="graph">
+      <h2>Hauteur de l’eau en fonction du temps</h2>
+      <svg viewBox="0 0 320 180" role="img" aria-label="Graphique : la hauteur monte pendant 5 minutes puis reste à 25 mm jusqu’à 10 minutes.">
+        <line x1="40" y1="150" x2="310" y2="150" stroke="var(--trait)" stroke-width="1.5"/>
+        <line x1="40" y1="150" x2="40" y2="15" stroke="var(--trait)" stroke-width="1.5"/>
+        <line x1="40" x2="310" y1="95" y2="95" stroke="var(--gris)" stroke-dasharray="4 4" stroke-width="1"/>
+        <line id="gRef" x1="40" x2="310" y1="95" y2="95" stroke="var(--p2)" stroke-dasharray="4 4" stroke-width="1.5"/>
+        <line x1="175" x2="175" y1="150" y2="15" stroke="var(--gris)" stroke-dasharray="4 4" stroke-width="1"/>
+        <text x="34" y="99" font-size="11" text-anchor="end">25</text>
+        <text x="34" y="44" font-size="11" text-anchor="end">50</text>
+        <text x="34" y="154" font-size="11" text-anchor="end">0</text>
+        <text x="8" y="22" font-size="11">mm</text>
+        <text x="40" y="168" font-size="11" text-anchor="middle">0</text>
+        <text x="175" y="168" font-size="11" text-anchor="middle">5</text>
+        <text x="310" y="168" font-size="11" text-anchor="end">10 min</text>
+        <polyline id="courbe" fill="none" stroke="var(--eau)" stroke-width="3" stroke-linejoin="round"/>
+        <circle id="point" r="5" fill="var(--eau)" cx="40" cy="150"/>
+      </svg>
+    </div>
+  </aside>
+</main>
+
+<div class="curseur">
+  <label for="curseur">Temps : fais glisser de 0 à 10 minutes</label>
+  <input type="range" id="curseur" min="0" max="600" step="1" value="0">
+  <div class="graduations"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10 min</span></div>
+</div>
+
+<footer>
+  <span>Schéma illustratif : l’écart entre les plaques est agrandi pour bien voir l’eau.</span>
+  <span>Etienne.P – 21/10/2026</span>
+</footer>
+
+<script>
+(function(){
+  var Y0 = 300;          // niveau du liquide (px)
+  var PX_MM = 60/25;     // 25 mm = 60 px
+  var HREF = 25;         // remontée avec l'écart normal (mm) – valeur du cours
+  var HMAX = 25;         // remontée finale actuelle (mm) = HREF × serrage
+  var GMAX = 50;         // échelle du graphique (mm)
+  var TFIN = 300;        // la remontée s'arrête à 5 min (s)
+  var TMAX = 600;        // curseur jusqu'à 10 min (s)
+
+  // trois paires : position au niveau du liquide, inclinaison par rapport à la verticale
+  var paires = [
+    {cx:230, tilt:0,  nom:"verticales"},
+    {cx:420, tilt:25, nom:"peu inclinées"},
+    {cx:610, tilt:58, nom:"très inclinées"}
+  ];
+  var NS = "http://www.w3.org/2000/svg";
+  var g = document.getElementById("paires");
+  var gx = document.getElementById("etiquettesX");
+  var ecart = 10, ep = 7, haut = 170, bas = 100; // longueurs locales (px)
+
+  function el(n, a){ var e=document.createElementNS(NS,n); for(var k in a) e.setAttribute(k,a[k]); return e; }
+
+  paires.forEach(function(p){
+    var grp = el("g",{transform:"translate("+p.cx+","+Y0+") rotate("+p.tilt+")"});
+    var c = Math.cos(p.tilt*Math.PI/180);
+    var L1 = haut/c, L2 = bas/c;
+    // eau entre les plaques (sous le niveau : toujours pleine)
+    p.eauBas = el("rect",{x:-ecart/2, y:0, width:ecart, height:L2, fill:"var(--eau)"});
+    grp.appendChild(p.eauBas);
+    p.eau = el("rect",{x:-ecart/2, y:0, width:ecart, height:0, fill:"var(--eau)"});
+    grp.appendChild(p.eau);
+    // les deux plaques de verre
+    p.verres = [-ecart/2-ep, ecart/2].map(function(x){
+      var r = el("rect",{x:x, y:-L1, width:ep, height:L1+L2, fill:"var(--verre)", "fill-opacity":".75", stroke:"var(--trait)", "stroke-width":"2"});
+      grp.appendChild(r); return r;
+    });
+    g.appendChild(grp);
+    var num = paires.indexOf(p) + 1, coul = "var(--p" + num + ")";
+    // pastille numérotée au-dessus de la paire
+    var sn = Math.sin(p.tilt*Math.PI/180), D = L1 + 24;
+    var bx = p.cx + sn*D, by = Y0 - c*D;
+    gx.appendChild(el("circle",{cx:bx, cy:by, r:17, fill:coul}));
+    var tn = el("text",{x:bx, y:by+7, "text-anchor":"middle", "font-size":"20", "font-weight":"700", style:"fill:#fff"});
+    tn.textContent = num; gx.appendChild(tn);
+    // étiquette courte x1 / x2 / x3, dans la couleur de la paire
+    p.lbl = el("text",{"font-size":"26","font-weight":"700", style:"fill:"+coul, stroke:"var(--fond2)", "stroke-width":"5", "paint-order":"stroke"});
+    var t1 = el("tspan",{}); t1.textContent = "x";
+    var t2 = el("tspan",{"font-size":"17", dy:"6"}); t2.textContent = num;
+    p.lbl.appendChild(t1); p.lbl.appendChild(t2);
+    gx.appendChild(p.lbl);
+  });
+
+  // remontée : rapide au début, puis ralentit et s'arrête à 5 min
+  function hauteur(t){
+    if (t >= TFIN) return HMAX;
+    var u = t / TFIN;
+    return HMAX * (1 - Math.pow(1-u, 3));
+  }
+
+  var curseur = document.getElementById("curseur");
+  var etat = document.getElementById("etat");
+  var btn = document.getElementById("btn");
+  var vitesse = document.getElementById("vitesse");
+  var courbe = document.getElementById("courbe");
+  var point = document.getElementById("point");
+
+  function fmt(n){ return n.toFixed(1).replace(".",",") + " mm"; }
+  function gx_(t){ return 40 + t/TMAX*270; }
+  function gy_(h){ return 150 - h/GMAX*110; }
+
+  // serrage : écart divisé par k  =>  hauteur multipliée par k
+  var serre = document.getElementById("serre");
+  var infoSerre = document.getElementById("infoSerre");
+  function fk(n){ return String(n).replace(".",","); }
+  function appliquerSerrage(){
+    var k = Number(serre.value);
+    HMAX = HREF * k;
+    var e = ecart / k; // écart dessiné
+    paires.forEach(function(p){
+      p.eauBas.setAttribute("x", -e/2); p.eauBas.setAttribute("width", e);
+      p.eau.setAttribute("x", -e/2);    p.eau.setAttribute("width", e);
+      p.verres[0].setAttribute("x", -e/2-ep);
+      p.verres[1].setAttribute("x", e/2);
+    });
+    var txtEcart = k === 1 ? "Écart normal" : (k > 1 ? "Écart ÷ " + fk(k) : "Écart × " + fk(1/k));
+    var diff = HMAX - HREF;
+    var gain = diff > 0 ? ' <span class="gain">+' + fmt(diff) + '</span>'
+             : diff < 0 ? ' <span class="gain">' + fmt(diff).replace("-", "−") + '</span>' : '';
+    infoSerre.innerHTML = txtEcart + " → hauteur d’équilibre <b>" + fmt(HMAX) + "</b>" + gain;
+    // cote dans le schéma
+    var cote = document.getElementById("coteSerre");
+    var yH = Y0 - HMAX*PX_MM;
+    cote.setAttribute("opacity", k === 1 ? 0 : 1);
+    document.getElementById("coteLigne").setAttribute("y2", yH + 2);
+    document.getElementById("coteHaut").setAttribute("y1", yH);
+    document.getElementById("coteHaut").setAttribute("y2", yH);
+    var tc = document.getElementById("coteTexte");
+    tc.setAttribute("y", (Y0 + yH)/2 + 7);
+    tc.textContent = fk(HMAX) + " mm";
+    // repère sur le graphique
+    document.getElementById("gRef").setAttribute("y1", gy_(HMAX));
+    document.getElementById("gRef").setAttribute("y2", gy_(HMAX));
+    afficher(t);
+  }
+  serre.addEventListener("input", appliquerSerrage);
+
+  function afficher(t){
+    var h = hauteur(t);
+    var hpx = h*PX_MM;
+    paires.forEach(function(p, i){
+      var c = Math.cos(p.tilt*Math.PI/180);
+      var L = hpx / c;
+      p.eau.setAttribute("y", -L);
+      p.eau.setAttribute("height", L);
+      var x = h / c;
+      document.getElementById("mX"+i).textContent = fmt(x);
+      // place l'étiquette x à côté du haut de l'eau
+      var s = Math.sin(p.tilt*Math.PI/180);
+      p.lbl.setAttribute("text-anchor", "start");
+      p.lbl.setAttribute("x", p.cx + s*L/2 + c*20);
+      p.lbl.setAttribute("y", Y0 - c*L/2 + s*20 + 10);
+      p.lbl.style.opacity = h > 0.5 ? 1 : 0;
+    });
+    document.getElementById("ligneH").setAttribute("y1", Y0-hpx);
+    document.getElementById("ligneH").setAttribute("y2", Y0-hpx);
+    document.getElementById("mH").textContent = fmt(h);
+    var m = Math.floor(t/60), s = Math.floor(t%60);
+    document.getElementById("temps").textContent = m + ":" + (s<10?"0":"") + s;
+
+    // courbe tracée jusqu'au temps actuel
+    var pts = [];
+    for (var k=0; k<=t; k+=5) pts.push(gx_(k)+","+gy_(hauteur(k)));
+    pts.push(gx_(t)+","+gy_(h));
+    courbe.setAttribute("points", pts.join(" "));
+    point.setAttribute("cx", gx_(t)); point.setAttribute("cy", gy_(h));
+
+    if (t <= 0) {
+      etat.textContent = "Appuie sur « Lancer » ou déplace le curseur.";
+      etat.classList.remove("fini");
+    } else if (t < TFIN) {
+      etat.textContent = "L’eau monte entre les plaques… Plus les plaques sont inclinées, plus la longueur mouillée x est grande."
+        + (HMAX > HREF ? " Plaques serrées : l’eau monte plus haut." : "");
+      etat.classList.remove("fini");
+    } else {
+      etat.textContent = "Équilibre atteint : l’eau ne monte plus. Elle reste à " + fmt(HMAX) + " au-dessus du niveau du liquide, quelle que soit l’inclinaison."
+        + (HMAX > HREF ? " Plus on serre les plaques, plus l’eau monte haut." : "");
+      etat.classList.add("fini");
+    }
+  }
+
+  var t = 0, enCours = false, dernier = null;
+  function boucle(ts){
+    if (!enCours) return;
+    if (dernier !== null) {
+      t += (ts - dernier)/1000 * Number(vitesse.value);
+      if (t >= TMAX) { t = TMAX; arreter(); }
+      curseur.value = Math.floor(t);
+      afficher(t);
+    }
+    dernier = ts;
+    if (enCours) requestAnimationFrame(boucle);
+  }
+  function lancer(){ if (t >= TMAX) t = 0; enCours = true; dernier = null; btn.textContent = "❚❚ Pause"; requestAnimationFrame(boucle); }
+  function arreter(){ enCours = false; btn.textContent = "▶ Lancer"; }
+
+  btn.addEventListener("click", function(){ enCours ? arreter() : lancer(); });
+  document.getElementById("raz").addEventListener("click", function(){ arreter(); t = 0; curseur.value = 0; afficher(0); });
+  curseur.addEventListener("input", function(){ t = Number(curseur.value); afficher(t); });
+
+  var plein = document.getElementById("plein");
+  function estPlein(){ return document.fullscreenElement || document.webkitFullscreenElement; }
+  plein.addEventListener("click", function(){
+    var d = document.documentElement;
+    if (estPlein()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
+    else { (d.requestFullscreen || d.webkitRequestFullscreen).call(d); }
+  });
+  function majPlein(){ plein.textContent = estPlein() ? "✕ Quitter le plein écran" : "⛶ Plein écran"; }
+  document.addEventListener("fullscreenchange", majPlein);
+  document.addEventListener("webkitfullscreenchange", majPlein);
+
+  appliquerSerrage();
+})();
+</script>
+</body>
+</html>
